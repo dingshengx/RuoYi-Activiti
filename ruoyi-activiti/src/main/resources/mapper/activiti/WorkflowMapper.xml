@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.activiti.mapper.WorkflowMapper">
+    
+    <resultMap type="Workflow" id="WorkflowResult">
+        <result property="id"    column="id"    />
+        <result property="procInstId"    column="proc_inst_id"    />
+        <result property="bizId"    column="biz_id"    />
+        <result property="bizModel"    column="biz_model"    />
+        <result property="currentNodeName"    column="current_node_name"    />
+        <result property="currentNodeKey"    column="current_node_key"    />
+        <result property="applicant"    column="applicant"    />
+        <result property="applicantName"    column="applicant_name"    />
+        <result property="applicantId"    column="applicant_id"    />
+        <result property="applyDept"    column="apply_dept"    />
+        <result property="applyTime"    column="apply_time"    />
+        <result property="approverBy"    column="approver_by"    />
+        <result property="approverName"    column="approver_name"    />
+        <result property="approverId"    column="approver_id"    />
+        <result property="approvedBy"    column="approved_by"    />
+        <result property="approvedName"    column="approved_name"    />
+        <result property="approvedId"    column="approved_id"    />
+        <result property="approvedTime"    column="approved_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="isDel"    column="is_del"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateId"    column="update_id"    />
+        <result property="updateName"    column="update_name"    />
+    </resultMap>
+
+    <sql id="selectWorkflowVo">
+        select id, proc_inst_id, biz_id, biz_model, current_node_name, current_node_key, applicant, applicant_name, applicant_id, apply_dept, apply_time, approver_by, approver_name, approver_id, approved_by, approved_name, approved_id, approved_time, remark, is_del, update_time, update_by, update_id, update_name from biz_workflow
+    </sql>
+
+    <select id="selectWorkflowList" parameterType="com.ruoyi.activiti.domain.dto.QueryWorkflowDTO" resultMap="WorkflowResult">
+        <include refid="selectWorkflowVo"/>
+        <where>
+            <if test="procInstId != null  and procInstId != ''"> and proc_inst_id = #{procInstId}</if>
+            <if test="bizId != null "> and biz_id = #{bizId}</if>
+            <if test="bizModel != null  and bizModel != ''"> and biz_model = #{bizModel}</if>
+            <if test="currentNodeName != null  and currentNodeName != ''"> and current_node_name like concat('%', #{currentNodeName}, '%')</if>
+            <if test="currentNodeKey != null  and currentNodeKey != ''"> and current_node_key = #{currentNodeKey}</if>
+            <if test="applicant != null  and applicant != ''"> and applicant = #{applicant}</if>
+            <if test="applicantName != null  and applicantName != ''"> and applicant_name like concat('%', #{applicantName}, '%')</if>
+            <if test="applicantId != null "> and applicant_id = #{applicantId}</if>
+            <if test="applyDept != null  and applyDept != ''"> and apply_dept = #{applyDept}</if>
+            <if test="applyTime != null "> and apply_time = #{applyTime}</if>
+            <if test="approverBy != null  and approverBy != ''"> and approver_by = #{approverBy}</if>
+            <if test="approverName != null  and approverName != ''"> and approver_name like concat('%', #{approverName}, '%')</if>
+            <if test="approverId != null "> and approver_id = #{approverId}</if>
+            <if test="approvedBy != null  and approvedBy != ''"> and approved_by = #{approvedBy}</if>
+            <if test="approvedName != null  and approvedName != ''"> and approved_name like concat('%', #{approvedName}, '%')</if>
+            <if test="approvedId != null "> and approved_id = #{approvedId}</if>
+            <if test="approvedTime != null "> and approved_time = #{approvedTime}</if>
+        </where>
+    </select>
+
+    <select id="selectCountByParam" resultType="int">
+        SELECT
+            count( 1 )
+        FROM
+            biz_workflow
+        <where>
+            is_del = 0
+            and biz_model = #{bizModel}
+            <if test="flowStatusList != null and flowStatusList.size() > 0">
+                and workflow_status in
+                <foreach collection="flowStatusList" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="dataType == 0 and approverId != null">
+                and FIND_IN_SET(#{approverId}, approver_id) &gt; 0
+            </if>
+            <if test="dataType == 1 and approverId != null">
+                and FIND_IN_SET(#{approverId}, approver_id) &lt; 1
+            </if>
+        </where>
+    </select>
+</mapper>

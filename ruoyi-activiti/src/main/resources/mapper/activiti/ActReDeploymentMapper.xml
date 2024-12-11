@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.activiti.mapper.ActReDeploymentMapper">
+
+	<resultMap type="ActReDeploymentVO" id="ActReDeploymentResult">
+		<id     property="id"       column="id"      />
+		<result property="deployTime"       column="deploy_time"      />
+	</resultMap>
+
+	<resultMap type="com.ruoyi.activiti.domain.vo.ProcessDefinitionVO" id="ProcessDefinitionResult">
+		<id property="id" column="ID_"/>
+		<result property="name" column="NAME_"/>
+		<result property="key" column="KEY_"/>
+		<result property="version" column="VERSION_"/>
+		<result property="deploymentId" column="DEPLOYMENT_ID_"/>
+		<result property="suspendState" column="SUSPENSION_STATE_"/>
+		<result property="resourceName" column="RESOURCE_NAME_"/>
+		<result property="deploymentTime" column="DEPLOY_TIME_"/>
+	</resultMap>
+	
+
+	<sql id="selectDeploymentVo">
+       select ID_ id,DEPLOY_TIME_ deploy_time from `act_re_deployment`
+    </sql>
+
+	
+	<select id="selectActReDeploymentByIds"  parameterType="String" resultMap="ActReDeploymentResult">
+	    <include refid="selectDeploymentVo"/>
+		where ID_  in
+		<foreach collection="ids" item="id" index="index" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
+
+	<select id="selectProcessDefinitionList" parameterType="com.ruoyi.activiti.domain.dto.QueryProcessDefinitionDTO" resultMap="ProcessDefinitionResult">
+		SELECT
+		a.ID_,
+		a.NAME_,
+		a.KEY_,
+		a.VERSION_,
+		a.DEPLOYMENT_ID_,
+		a.SUSPENSION_STATE_,
+		a.RESOURCE_NAME_,
+		b.DEPLOY_TIME_
+		FROM
+		act_re_procdef a
+		LEFT JOIN act_re_deployment b ON a.DEPLOYMENT_ID_ = b.ID_
+		<where>
+			<if test="name != null and name != ''">
+				AND a.NAME_ like concat('%', #{name}, '%')
+			</if>
+			<if test="key != null and key != ''">
+				AND a.KEY_ like concat('%', #{key}, '%')
+			</if>
+			<if test="beginTime != null">
+				AND date_format(b.DEPLOY_TIME_,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+			</if>
+			<if test="endTime != null">
+				AND date_format(b.DEPLOY_TIME_,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+			</if>
+			<if test="suspendState == 0">
+				AND a.SUSPENSION_STATE_ = 1
+			</if>
+			<if test="suspendState == 1">
+				AND a.SUSPENSION_STATE_ = 2
+			</if>
+		</where>
+	</select>
+
+
+</mapper> 

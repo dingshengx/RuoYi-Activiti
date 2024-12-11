@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.activiti.mapper.ActRuTaskMapper">
+
+    <resultMap type="ActRuTaskVO" id="ActRuTaskResult">
+        <result property="taskId" column="taskId"/>
+        <result property="processInstanceId" column="processInstanceId"/>
+        <result property="node" column="node"/>
+        <result property="name" column="name"/>
+        <result property="approverBy" column="approverBy"/>
+        <result property="createTime" column="createTime"/>
+    </resultMap>
+
+
+    <select id="selectActRuTaskVo" parameterType="string" resultMap="ActRuTaskResult">
+        SELECT
+        a.ID_ AS taskId,
+        a.PROC_INST_ID_ AS processInstanceId,
+        a.TASK_DEF_KEY_ AS node,
+        a.NAME_ AS NAME,
+        a.CREATE_TIME_ AS createTime,
+        b.USER_ID_ AS approverBy
+        FROM
+        act_ru_task a
+        LEFT JOIN act_ru_identitylink b ON a.ID_ = b.TASK_ID_
+        WHERE
+        a.PROC_INST_ID_ = #{processInstanceId}
+    </select>
+
+    <select id="selectApprovedTaskList" parameterType="string" resultType="ApprovalRecordVO">
+        select task.PROC_INST_ID_ as processInstanceId,task.TASK_DEF_KEY_ as taskDefKey,task.name_ as taskDefName,
+        d.dept_name as deptName,u.nick_name as approvedName,u.user_id as approvedId,
+        ifnull(sc.MESSAGE_,1) as state,c.MESSAGE_ as remark,DATE_FORMAT(task.START_TIME_, '%Y-%m-%d %H:%i:%s')  as
+        taskStartTime,
+        DATE_FORMAT(task.END_TIME_, '%Y-%m-%d %H:%i:%s') as approvedTime,task.ID_ as taskId from act_hi_taskinst task
+        left join act_hi_comment sc on task.id_ = sc.task_id_ and sc.type_='state'
+        left join act_hi_comment c on task.id_ = c.task_id_ and c.type_ = 'comment'
+        left join sys_user u on task.ASSIGNEE_ = u.user_name
+        left join sys_dept d on u.dept_id = d.dept_id
+        where
+            task.END_TIME_ IS NOT NULL
+            AND task.ASSIGNEE_ IS NOT NULL
+            and task.PROC_INST_ID_=#{processInstanceId}
+        order by task.START_TIME_
+    </select>
+    <select id="selectAttachmentList" parameterType="string" resultType="AttachmentVO">
+        select URL_ as fileId,name_ as fileName,task_id_ as taskId from act_hi_attachment where
+        proc_inst_id_=#{processInstanceId}
+    </select>
+
+
+
+    <select id="selectActRuTaskVoList" parameterType="list" resultMap="ActRuTaskResult">
+        SELECT
+        a.ID_ AS taskId,
+        a.PROC_INST_ID_ AS processInstanceId,
+        a.TASK_DEF_KEY_ AS node,
+        a.NAME_ AS NAME,
+        a.CREATE_TIME_ AS createTime,
+        b.USER_ID_ AS approverBy
+        FROM
+        act_ru_task a
+        LEFT JOIN act_ru_identitylink b ON a.ID_ = b.TASK_ID_
+        WHERE
+        a.PROC_INST_ID_  in
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+
+</mapper> 
