@@ -86,12 +86,6 @@ public class ProcessQueryServiceImpl implements IProcessQueryService {
         return records;
     }
 
-    /**
-     * 审批进度
-     *
-     * @param processInstanceId 流程实例ID
-     * @return
-     */
     @Override
     public List<ApprovalProgressVO> selectApprovalProgressList(String processInstanceId) {
         List<ApprovalProgressVO> progressList = new ArrayList<>();
@@ -111,7 +105,6 @@ public class ProcessQueryServiceImpl implements IProcessQueryService {
                     currentTask.getTaskDefinitionKey(),
                     currentTask.getFormKey());
         }
-        SysUser tempUser;
         String approveName;
         for (UserTask userTask : userTasks) {
             //执行表达式判断是否跳过

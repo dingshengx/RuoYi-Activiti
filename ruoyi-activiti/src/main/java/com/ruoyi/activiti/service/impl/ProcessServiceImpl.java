@@ -6,7 +6,6 @@ import cn.hutool.core.util.StrUtil;
 import com.ruoyi.activiti.constants.ProcessConstants;
 import com.ruoyi.activiti.constants.ProcessStatus;
 import com.ruoyi.activiti.domain.Workflow;
-import com.ruoyi.activiti.domain.dto.ApprovalInfo2DTO;
 import com.ruoyi.activiti.domain.dto.ApprovalInfoDTO;
 import com.ruoyi.activiti.domain.dto.StartWorkflowDTO;
 import com.ruoyi.activiti.service.DynamicJumpCmd;
@@ -44,10 +43,6 @@ public class ProcessServiceImpl implements IProcessService {
     @Autowired
     private ISysUserService userService;
 
-    @Override
-    public String submit(String processDefinitionKey, String businessKey, Map<String, Object> variables) {
-        return this.doSubmit(processDefinitionKey, businessKey, variables);
-    }
 
     @Override
     public String submit(StartWorkflowDTO startWorkflowDTO) {
@@ -71,15 +66,13 @@ public class ProcessServiceImpl implements IProcessService {
     }
 
     @Override
-    public void approval(ApprovalInfo2DTO approvalInfo2DTO) {
+    public void approval(ApprovalInfoDTO approvalInfoDTO) {
         //查询流程信息
-        Workflow workflow = workflowService.getOne(approvalInfo2DTO.getBizModel(), approvalInfo2DTO.getBizId());
+        Workflow workflow = workflowService.getOne(approvalInfoDTO.getBizModel(), approvalInfoDTO.getBizId());
         Assert.notNull(workflow, "找不到流程信息，请确认是否发起流程。");
         //构建参数
-        ApprovalInfoDTO approvalInfoDTO =
-                ApprovalInfoDTO.builder().assignee(SecurityUtils.getUsername()).state(approvalInfo2DTO.getState()).
-                        processInstanceId(workflow.getProcInstId()).attachments(approvalInfo2DTO.getAttachments()).
-                        variables(approvalInfo2DTO.getVariables()).remark(approvalInfo2DTO.getRemark()).build();
+        approvalInfoDTO.setAssignee(SecurityUtils.getUsername());
+        approvalInfoDTO.setProcessInstanceId(workflow.getProcInstId());
         //提交审批
         doApproval(approvalInfoDTO);
         //回写流程信息
@@ -118,11 +111,6 @@ public class ProcessServiceImpl implements IProcessService {
         return processInstance.getId();
     }
 
-    @Override
-    public void approval(ApprovalInfoDTO approvalInfoDTO) {
-        //提交审批
-        doApproval(approvalInfoDTO);
-    }
 
     public void doApproval(ApprovalInfoDTO approvalInfoDTO) {
         ProcessEngine engine = ProcessEngines.getDefaultProcessEngine();
@@ -153,24 +141,17 @@ public class ProcessServiceImpl implements IProcessService {
     }
 
     @Override
-    public void rollback(ApprovalInfo2DTO approvalInfo2DTO) {
+    public void rollback(ApprovalInfoDTO approvalInfoDTO) {
         //查询流程信息
-        Workflow workflow = workflowService.getOne(approvalInfo2DTO.getBizModel(), approvalInfo2DTO.getBizId());
+        Workflow workflow = workflowService.getOne(approvalInfoDTO.getBizModel(), approvalInfoDTO.getBizId());
         Assert.notNull(workflow, "找不到流程信息，请确认是否发起流程。");
         //构建参数
-        ApprovalInfoDTO approvalInfoDTO =
-                ApprovalInfoDTO.builder().assignee(SecurityUtils.getUsername()).state(approvalInfo2DTO.getState()).
-                        processInstanceId(workflow.getProcInstId()).attachments(approvalInfo2DTO.getAttachments()).
-                        variables(approvalInfo2DTO.getVariables()).remark(approvalInfo2DTO.getRemark()).build();
+        approvalInfoDTO.setAssignee(SecurityUtils.getUsername());
+        approvalInfoDTO.setProcessInstanceId(workflow.getProcInstId());
         //提交退回
         doRollback(approvalInfoDTO);
         //回写流程信息
         updateWorkflowInfo(workflow.getProcInstId());
-    }
-
-    @Override
-    public void rollback(ApprovalInfoDTO approvalInfoDTO) {
-        doRollback(approvalInfoDTO);
     }
 
     public void doRollback(ApprovalInfoDTO approvalInfoDTO) {
@@ -354,12 +335,7 @@ public class ProcessServiceImpl implements IProcessService {
         return processInstance == null || processInstance.isEnded();
     }
 
-    /**
-     * 根据流程实例ID获取对应流程定义的用户任务节点集合
-     *
-     * @param processInstanceId 流程实例ID
-     * @return 用户任务节点集合
-     */
+
     @Override
     public List<UserTask> getUserTasksByProcessInstanceId(String processInstanceId) {
         // 获取流程引擎

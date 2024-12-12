@@ -5,7 +5,7 @@ import com.ruoyi.activiti.domain.dto.QueryProcessDefinitionDTO;
 import com.ruoyi.activiti.domain.vo.ProcessDefinitionVO;
 import com.ruoyi.activiti.mapper.ActReDeploymentMapper;
 import com.ruoyi.activiti.service.IProcessDefinitionService;
-import com.ruoyi.common.config.ZnderConfig;
+import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.HistoryService;
@@ -104,7 +104,7 @@ public class ProcessDefinitionServiceImpl implements IProcessDefinitionService {
 
     @Override
     public String upload(MultipartFile multipartFile) throws IOException {
-       return FileUploadUtils.upload(ZnderConfig.getUploadPath()+"/processDefinition" , multipartFile);
+       return FileUploadUtils.upload(RuoYiConfig.getUploadPath()+"/processDefinition" , multipartFile);
     }
 
     @Override
