@@ -63,6 +63,14 @@ spring:
     restart:
       # 热部署开关
       enabled: true
+  # activiti流程配置
+  activiti:
+    check-process-definitions: false
+    database-schema-update: true
+    history-level: full
+    db-history-used: true
+  main:
+    allow-bean-definition-overriding: true
   # redis 配置
   redis:
     # 地址
@@ -92,7 +100,7 @@ spring:
     druid:
       # 主库数据源
       master:
-        url: jdbc:mysql://localhost:3306/ry-activiti?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+        url: jdbc:mysql://localhost:3306/ry-activiti?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
         username: root
         password: 123456
       # 从库数据源

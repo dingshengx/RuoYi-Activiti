@@ -1,32 +1,19 @@
 package com.ruoyi.activiti.domain.dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.activiti.engine.repository.ProcessDefinition;
 
+@Setter
+@Getter
 public class DefinitionIdDTO {
-    private String deploymentID;
-    private String resourceName;
+  private String deploymentID;
+  private String resourceName;
 
-    public String getDeploymentID() {
-        return deploymentID;
-    }
+  public DefinitionIdDTO() {}
 
-    public void setDeploymentID(String deploymentID) {
-        this.deploymentID = deploymentID;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
-    }
-
-    public DefinitionIdDTO() {
-    }
-
-    public DefinitionIdDTO(ProcessDefinition processDefinition) {
-        this.deploymentID = processDefinition.getDeploymentId();
-        this.resourceName = processDefinition.getResourceName();
-    }
+  public DefinitionIdDTO(ProcessDefinition processDefinition) {
+    this.deploymentID = processDefinition.getDeploymentId();
+    this.resourceName = processDefinition.getResourceName();
+  }
 }
