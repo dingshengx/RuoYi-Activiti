@@ -120,4 +120,20 @@ public class Knife4jConfiguration {
                 // 版本
                 .version("版本号:" + ruoyiConfig.getVersion()).build();
     }
+
+    /**
+     * 接口文档分组
+     * @return Docket
+     */
+    @Bean
+    public Docket omsApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("activiti")
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.ruoyi.activiti"))
+                .paths(PathSelectors.any())
+                .build();
+    }
+
+
 }
