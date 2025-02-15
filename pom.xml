@@ -313,6 +313,7 @@
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
         <module>ruoyi-activiti</module>
+        <module>ruoyi-batch</module>
     </modules>
     <packaging>pom</packaging>
 
